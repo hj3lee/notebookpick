@@ -13,7 +13,9 @@ app = FastAPI()
 @app.post("/recommend")
 def recommend(prefs: dict):
     result_df = calc_budget_based_scores(df, prefs)
+    result_df = result_df.fillna(0)
     return {
         "count": len(result_df),
         "results": result_df.to_dict(orient="records")
+
     }
