@@ -358,30 +358,3 @@ def calc_budget_based_scores(df, prefs):
     
     return df_budget
 
-#%% 실험용
-
-
-prefs = {
-    # === 예산 ===
-    "budget_min": 100,        # 예산 하한 (만원)
-    "budget_max": 160,        # 예산 상한 (만원)
-    "budget_prefer": 130,     # 가장 선호하는 가격대
-
-    # === 1~6 척도 선호 ===
-    "size": 5,                # 화면 크기 강력 선호 (큰 화면)
-    "color": 4,               # 색역 중요
-    "resolution": 4,          # 해상도 중요
-    "weight": 2,              # 무게는 덜 중요
-    "gaming": 3,              # 게이밍 성능 중립
-
-    # === 기능 선호 (True / False) ===
-    "touch": True,            # 터치 필요
-    "convertible": False,     # 360도 힌지 불필요
-    "oled": True,             # OLED 선호
-    "ips": False,             # IPS는 상관 없음
-    "sd_slot": True,          # SD 카드 슬롯 필요
-    "thunderbolt_usb4": False,# 썬더볼트 불필요
-    "window": True            # Windows 필요
-}
-
-result_df = calc_budget_based_scores(df, prefs)
