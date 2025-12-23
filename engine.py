@@ -349,12 +349,6 @@ def calc_budget_based_scores(df, prefs):
     df_budget = df_budget[priority_cols + other_cols]
         
 
-    # === 엑셀 저장 ===
-    timestamp = datetime.now().strftime("%m%d_%H%M")
-    filename = f"notebook_result_{timestamp}.xlsx"
-    df_budget.to_excel(filename, index=False)
-    
-    print(f"\n엑셀 저장 완료 → {filename}")
-    
     return df_budget
+
 
