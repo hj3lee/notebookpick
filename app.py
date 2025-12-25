@@ -7,6 +7,7 @@ Created on Sun Dec 21 08:06:05 2025
 
 from fastapi import FastAPI
 from engine import calc_budget_based_scores, df
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -27,4 +28,5 @@ def recommend(prefs: dict):
         "results": result_df.to_dict(orient="records")
 
     }
+
 
