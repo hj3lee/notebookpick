@@ -344,11 +344,18 @@ def calc_budget_based_scores(df, prefs):
     "thunderbolt_usb4_score"
 ]
 
-    
+    df_budget = (
+    df_budget
+    .sort_values(by="final_score", ascending=False)
+    .head(5)
+    .reset_index(drop=True)
+)
+
+
     other_cols = [c for c in df_budget.columns if c not in priority_cols]
     df_budget = df_budget[priority_cols + other_cols]
+	return df_budget
         
 
-    return df_budget
 
 
