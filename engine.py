@@ -182,130 +182,130 @@ def resolution_standard_scores(resolution_values):
 
 def calc_budget_based_scores(df, prefs):
     """
-    예산 정보(prefs)를 바탕으로:
-    1) 예산 범위 내 노트북 필터링 (±10% 확장 범위 사용)
-    2) price_score 계산
-    3) budget_fit_score 계산
-    
-    4) 결과를 출력하고, 점수 컬럼이 추가된 df_budget을 반환한다.
-    """
-
-    budget_min = prefs["budget_min"]
-    budget_max = prefs["budget_max"]
-    budget_prefer = prefs["budget_prefer"]
-    multiple_map = {1: -3, 2: -2, 3: -1, 4: 1, 5: 2, 6: 3}
-
-    print("\n=== 예산 범위 내 노트북 필터링 ===")
-    print(f"예산 범위: {budget_min:.0f}만 ~ {budget_max:.0f}만, 선호 예산: {budget_prefer:.0f}만")
-
-    # 1) 계산용 예산 범위 (±10%)
-    budget_min_calc = budget_min * 0.9
-    budget_max_calc = budget_max * 1.1
-
-    # 2) 예산 범위(현재가격 기준) 안에 있는 노트북만 선택
-    df_budget = df[
-        (df["price_current"] >= budget_min_calc) &
-        (df["price_current"] <= budget_max_calc)
-    ].copy()
-    
-
-    # 1) price_score 계산 (적정가 vs 현재가격)
-    df_budget["price_score"] = df_budget.apply(
-        lambda row: round(price_score(row["price_reference"], row["price_current"]), 2),
-        axis=1)
-    
-    # 2) budget_fit_score 계산 (zero-sum)
-    price_list = df_budget["price_current"].tolist()
-    budget_scores = budget_fit_scores(price_list, budget_prefer)
-    df_budget["budget_fit_score"] = [round(s, 2) for s in budget_scores]
-      
-    # 3) screen_size_score 계산
-    screen_sizes = df_budget["screen_size"].tolist()
-    size_scores = screen_size_scores(screen_sizes, prefs["size"])
-    df_budget["screen_size_score"] = size_scores
-    
-    # 4) Color_gamut_Score
-    color_list = df_budget["color_gamut"].tolist()
-    color_multiple = multiple_map[prefs["color"]]
-    df_budget["color_gamut_score"] = [round(s * color_multiple, 2) 
-                                for s in color_standard_scores(color_list)]
-    
-    # 5) Resolution_Score 
-    resolution_list = df_budget["resolution"].tolist()
-    resolution_multiple = multiple_map[prefs["resolution"]]
-    df_budget["resolution_score"] = [round(s * resolution_multiple, 2) 
-                                     for s in resolution_standard_scores(resolution_list)]
-    
-    # 6) Weight_Score
-    weight_list = df_budget["weight_diff_pct"].tolist()
-    weight_multiple = multiple_map[prefs["weight"]]
-    df_budget["weight_score"] = [round(s * weight_multiple, 2) 
-                                 for s in weight_standard_scores(weight_list)]
-    
-    # 7) Gaming_Score
-    gaming_list = df_budget["gaming_level"].tolist()
-    gaming_multiple = multiple_map[prefs["gaming"]]
-    df_budget["gaming_score"] = [round(s * gaming_multiple, 2)
-                                 for s in gaming_standard_scores(gaming_list)]
-
-    
-    # 7) battery score
-    
-    # 8) touch score
-    if prefs["touch"]:
-    	_temp = df_budget["touch"] * 5
-    else:
-    	_temp = df_budget["touch"] * 0
-    
-    mean_val = _temp.mean()
-    df_budget["touch_score"] = (_temp - mean_val).round(2)
-    
-    if prefs["convertible"]:
-    	_temp = df_budget["convertible"] * 5
-    else:
-        _temp = df_budget["convertible"] * 0
-
-    mean_val = _temp.mean()
-    df_budget["convertible_score"] = (_temp - mean_val).round(2)
-    
-    if prefs["oled"]:
-    	_temp = df_budget["oled"] * 5
-    else:
-    	_temp = df_budget["oled"] * 0
-    mean_val = _temp.mean()
-    df_budget["oled_score"] = (_temp - mean_val).round(2)
-
-    if prefs["ips"]:
-    	_temp = df_budget["ips"] * 5
-    else:
-    	_temp = df_budget["ips"] * 0
-    
-    mean_val = _temp.mean()
-    df_budget["ips_score"] = (_temp - mean_val).round(2)
-
-    if prefs["sd_slot"]:
-    	_temp = df_budget["sd_slot"] * 5
-    else:
-        _temp = df_budget["sd_slot"] * 0
-
-    mean_val = _temp.mean()
-    df_budget["sd_slot_score"] = (_temp - mean_val).round(2)
-    
-    if prefs["thunderbolt_usb4"]:
-    	_temp = df_budget["thunderbolt_usb4"] * 5
-    else:
-    	_temp = df_budget["thunderbolt_usb4"] * 0
-    mean_val = _temp.mean()
-    df_budget["thunderbolt_usb4_score"] = (_temp - mean_val).round(2)
-        
-    if prefs["window"]:
-        _temp = df_budget["window"] *5
-    else:
-        _temp = df_budget["window"] *0
-    df_budget["window_score"] = (_temp - mean_val).round(2)
-        
-    
-    df_budget["final_score"] = (
+	예산 정보(prefs)를 바탕으로:
+	1) 예산 범위 내 노트북 필터링 (±10% 확장 범위 사용)
+	2) price_score 계산
+	3) budget_fit_score 계산
+	
+	4) 결과를 출력하고, 점수 컬럼이 추가된 df_budget을 반환한다.
+	"""
+	
+	budget_min = prefs["budget_min"]
+	budget_max = prefs["budget_max"]
+	budget_prefer = prefs["budget_prefer"]
+	multiple_map = {1: -3, 2: -2, 3: -1, 4: 1, 5: 2, 6: 3}
+	
+	print("\n=== 예산 범위 내 노트북 필터링 ===")
+	print(f"예산 범위: {budget_min:.0f}만 ~ {budget_max:.0f}만, 선호 예산: {budget_prefer:.0f}만")
+	
+	# 1) 계산용 예산 범위 (±10%)
+	budget_min_calc = budget_min * 0.9
+	budget_max_calc = budget_max * 1.1
+	
+	# 2) 예산 범위(현재가격 기준) 안에 있는 노트북만 선택
+	df_budget = df[
+		(df["price_current"] >= budget_min_calc) &
+		(df["price_current"] <= budget_max_calc)
+	].copy()
+	
+	
+	# 1) price_score 계산 (적정가 vs 현재가격)
+	df_budget["price_score"] = df_budget.apply(
+		lambda row: round(price_score(row["price_reference"], row["price_current"]), 2),
+		axis=1)
+	
+	# 2) budget_fit_score 계산 (zero-sum)
+	price_list = df_budget["price_current"].tolist()
+	budget_scores = budget_fit_scores(price_list, budget_prefer)
+	df_budget["budget_fit_score"] = [round(s, 2) for s in budget_scores]
+	  
+	# 3) screen_size_score 계산
+	screen_sizes = df_budget["screen_size"].tolist()
+	size_scores = screen_size_scores(screen_sizes, prefs["size"])
+	df_budget["screen_size_score"] = size_scores
+	
+	# 4) Color_gamut_Score
+	color_list = df_budget["color_gamut"].tolist()
+	color_multiple = multiple_map[prefs["color"]]
+	df_budget["color_gamut_score"] = [round(s * color_multiple, 2) 
+								for s in color_standard_scores(color_list)]
+	
+	# 5) Resolution_Score 
+	resolution_list = df_budget["resolution"].tolist()
+	resolution_multiple = multiple_map[prefs["resolution"]]
+	df_budget["resolution_score"] = [round(s * resolution_multiple, 2) 
+									 for s in resolution_standard_scores(resolution_list)]
+	
+	# 6) Weight_Score
+	weight_list = df_budget["weight_diff_pct"].tolist()
+	weight_multiple = multiple_map[prefs["weight"]]
+	df_budget["weight_score"] = [round(s * weight_multiple, 2) 
+								 for s in weight_standard_scores(weight_list)]
+	
+	# 7) Gaming_Score
+	gaming_list = df_budget["gaming_level"].tolist()
+	gaming_multiple = multiple_map[prefs["gaming"]]
+	df_budget["gaming_score"] = [round(s * gaming_multiple, 2)
+								 for s in gaming_standard_scores(gaming_list)]
+	
+	
+	# 7) battery score
+	
+	# 8) touch score
+	if prefs["touch"]:
+		_temp = df_budget["touch"] * 5
+	else:
+		_temp = df_budget["touch"] * 0
+	
+	mean_val = _temp.mean()
+	df_budget["touch_score"] = (_temp - mean_val).round(2)
+	
+	if prefs["convertible"]:
+		_temp = df_budget["convertible"] * 5
+	else:
+		_temp = df_budget["convertible"] * 0
+	
+	mean_val = _temp.mean()
+	df_budget["convertible_score"] = (_temp - mean_val).round(2)
+	
+	if prefs["oled"]:
+		_temp = df_budget["oled"] * 5
+	else:
+		_temp = df_budget["oled"] * 0
+	mean_val = _temp.mean()
+	df_budget["oled_score"] = (_temp - mean_val).round(2)
+	
+	if prefs["ips"]:
+		_temp = df_budget["ips"] * 5
+	else:
+		_temp = df_budget["ips"] * 0
+	
+	mean_val = _temp.mean()
+	df_budget["ips_score"] = (_temp - mean_val).round(2)
+	
+	if prefs["sd_slot"]:
+		_temp = df_budget["sd_slot"] * 5
+	else:
+		_temp = df_budget["sd_slot"] * 0
+	
+	mean_val = _temp.mean()
+	df_budget["sd_slot_score"] = (_temp - mean_val).round(2)
+	
+	if prefs["thunderbolt_usb4"]:
+		_temp = df_budget["thunderbolt_usb4"] * 5
+	else:
+		_temp = df_budget["thunderbolt_usb4"] * 0
+	mean_val = _temp.mean()
+	df_budget["thunderbolt_usb4_score"] = (_temp - mean_val).round(2)
+		
+	if prefs["window"]:
+		_temp = df_budget["window"] *5
+	else:
+		_temp = df_budget["window"] *0
+	df_budget["window_score"] = (_temp - mean_val).round(2)
+		
+	
+	df_budget["final_score"] = (
 	60
 	+ df_budget["price_score"]
 	+ df_budget["budget_fit_score"]
@@ -313,40 +313,37 @@ def calc_budget_based_scores(df, prefs):
 	+ df_budget["color_gamut_score"]
 	+ df_budget["resolution_score"]
 	+ df_budget["weight_score"]
-    + df_budget["gaming_score"]
+	+ df_budget["gaming_score"]
 	+ df_budget["touch_score"]
 	+ df_budget["convertible_score"]
 	+ df_budget["oled_score"]
 	+ df_budget["ips_score"]
 	+ df_budget["sd_slot_score"]
 	+ df_budget["thunderbolt_usb4_score"]
-    ).round(2)
-    
-    priority_cols = [
-    "brand",
-    "name",
-    "variant",
-    "final_score",
-
-    "price_score",
-    "budget_fit_score",
-    "screen_size_score",
-    "color_gamut_score",
-    "resolution_score",
-    "weight_score",
-    "gaming_score",
-
-    "touch_score",
-    "convertible_score",
-    "oled_score",
-    "ips_score",
-    "sd_slot_score",
-    "thunderbolt_usb4_score"
-]
-
-
-
-
+	).round(2)
+	
+	priority_cols = [
+	"brand",
+	"name",
+	"variant",
+	"final_score",
+	
+	"price_score",
+	"budget_fit_score",
+	"screen_size_score",
+	"color_gamut_score",
+	"resolution_score",
+	"weight_score",
+	"gaming_score",
+	
+	"touch_score",
+	"convertible_score",
+	"oled_score",
+	"ips_score",
+	"sd_slot_score",
+	"thunderbolt_usb4_score"
+	]
+	
 	other_cols = [c for c in df_budget.columns if c not in priority_cols]
 	# final_score 기준 내림차순 정렬 후 상위 5개만 선택
 	df_budget = (
@@ -355,8 +352,9 @@ def calc_budget_based_scores(df, prefs):
 	.head(5)
 	.reset_index(drop=True)
 	)
-
+	
 	return df_budget
+
 
 
 
