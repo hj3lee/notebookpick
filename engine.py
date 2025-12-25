@@ -347,16 +347,17 @@ def calc_budget_based_scores(df, prefs):
 
 
 
-    other_cols = [c for c in df_budget.columns if c not in priority_cols]
-		# final_score 기준 내림차순 정렬 후 상위 5개만 선택
+	other_cols = [c for c in df_budget.columns if c not in priority_cols]
+	# final_score 기준 내림차순 정렬 후 상위 5개만 선택
 	df_budget = (
-		df_budget
-		.sort_values(by="final_score", ascending=False)
-		.head(5)
-		.reset_index(drop=True)
+	df_budget
+	.sort_values(by="final_score", ascending=False)
+	.head(5)
+	.reset_index(drop=True)
 	)
 
 	return df_budget
+
 
 
 
