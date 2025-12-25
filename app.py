@@ -10,6 +10,14 @@ from engine import calc_budget_based_scores, df
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 테스트 단계
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.post("/recommend")
 def recommend(prefs: dict):
     result_df = calc_budget_based_scores(df, prefs)
@@ -19,3 +27,4 @@ def recommend(prefs: dict):
         "results": result_df.to_dict(orient="records")
 
     }
+
