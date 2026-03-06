@@ -21,22 +21,24 @@ def create_driver(version_main=144):
     options.add_argument("--disable-infobars")
     options.add_argument("--disable-popup-blocking")
     options.add_argument("--start-maximized")
+    
+    global driver, wait
 
     driver = uc.Chrome(options=options, version_main=version_main)
 
     driver.set_page_load_timeout(45)
     driver.set_script_timeout(30)
-
     wait = WebDriverWait(driver, 15)
-    return driver, wait
+    
 
-def restart_driver(driver):
+def restart_driver():
     try:
         driver.quit()
     except:
         pass
     time.sleep(5)
-    return create_driver()
+    create_driver()
+
 
 def check_soldout():
     restock_btn = driver.find_elements(
@@ -142,16 +144,17 @@ def find_price():
 
 import pandas as pd
 
-data_dir = r"C:\notebookpick\notebookpick\data\basedata"
+data_dir = r"C:\notebookpick\data\basedata"
 files = glob.glob(os.path.join(data_dir, "basedata_*.csv"))
 latest_file = sorted(files)[-1]
 df = pd.read_csv(latest_file, encoding="cp949")
  
 page_wait1 = 10
-page_wait2= 500
+page_wait2= 200
 batch_reset=20
 
-driver, wait = create_driver()
+driver=None
+wait=None
 
 try:
     for idx, row in df.iterrows():
@@ -165,7 +168,7 @@ try:
          # 40개마다 드라이버 리셋
         if idx > 0 and idx % batch_reset == 0:
             print("🔄 40개 처리 → 드라이버 재시작")
-            driver, wait = restart_driver(driver)
+            restart_driver()
             time.sleep(60)
 
         try:
@@ -176,7 +179,6 @@ try:
 
             if check_soldout() == True:
                 df.at[idx, "sold_out"] = "1"
-                continue
 
             price = find_price()
             
@@ -197,22 +199,31 @@ try:
 finally:
     driver.quit()
     
-    now_str = datetime.now().strftime("%Y%m%d_%H%M")
-    save_dir = r"C:\notebookpick\notebookpick\data\crawldata"
-    filename = f"{save_dir}\\crawldata_{now_str}.csv"
+mask = df["sold_out"].isna() | (df["sold_out"] == "")
 
-    df.to_csv(
-        filename,
-        index=False,
-        encoding="utf-8-sig"
-    )
-    
-    print('csv 저장 완료')
+df.loc[mask, "discount_rate"] = (
+    (df.loc[mask, "price_current"] / df.loc[mask, "price_reference"] - 1)
+    .mul(100)
+    .round(1)
+    .astype(str))
+
+now_str = datetime.now().strftime("%Y%m%d_%H%M")
+save_dir = r"C:\notebookpick\data\crawldata"
+filename = f"{save_dir}\\crawldata_{now_str}.csv"
+
+
+df.to_csv(
+    filename,
+    index=False,
+    encoding="utf-8-sig"
+)
+
+print('csv 저장 완료')
     
 
-    os.system(r'git add C:\notebookpick\data\crawldata')
-    os.system('git commit -m "크롤링 데이터 업데이트"')
-    os.system("git push")
+os.system(r'git add C:\notebookpick\data\crawldata')
+os.system('git commit -m "크롤링 데이터 업데이트"')
+os.system("git push")
 
 
 #%%test
