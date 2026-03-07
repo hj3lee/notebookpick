@@ -32,6 +32,7 @@ def create_driver(version_main=144):
     
 
 def restart_driver():
+    global driver, wait
     try:
         driver.quit()
     except:
@@ -49,8 +50,13 @@ def check_soldout():
     if restock_btn:
         return True
 
+def check_denied():
+    if "Access Denied" in driver.title:
+        print("차단 페이지 감지")
+        return True
 
 def find_price():
+
     
     jsonld_elements = driver.find_elements(
         By.CSS_SELECTOR,
@@ -75,7 +81,7 @@ def find_price():
                 break
         
             except Exception:
-                continue
+                    continue
     
     print("판매가:", sale_price)
     best_price = sale_price
@@ -151,10 +157,12 @@ df = pd.read_csv(latest_file, encoding="cp949")
  
 page_wait1 = 10
 page_wait2= 200
-batch_reset=20
+batch_reset=40
 
 driver=None
 wait=None
+
+create_driver()
 
 try:
     for idx, row in df.iterrows():
@@ -176,9 +184,16 @@ try:
             driver.get(link)
             time.sleep(page_wait1)
 
+            if check_denied() == True:
+
+                df.at[idx, "sold_out"] = 2
+                time.sleep(page_wait2*2)
+                restart_driver()
+                continue
+
 
             if check_soldout() == True:
-                df.at[idx, "sold_out"] = "1"
+                df.at[idx, "sold_out"] = 1
 
             price = find_price()
             
@@ -205,7 +220,7 @@ df.loc[mask, "discount_rate"] = (
     (df.loc[mask, "price_current"] / df.loc[mask, "price_reference"] - 1)
     .mul(100)
     .round(1)
-    .astype(str))
+    )
 
 now_str = datetime.now().strftime("%Y%m%d_%H%M")
 save_dir = r"C:\notebookpick\data\crawldata"
@@ -221,10 +236,9 @@ df.to_csv(
 print('csv 저장 완료')
     
 
-os.system(r'git add C:\notebookpick\data\crawldata')
+os.chdir(r"C:\notebookpick")
+
+os.system("git add data/crawldata")
 os.system('git commit -m "크롤링 데이터 업데이트"')
 os.system("git push")
-
-
-#%%test
 
