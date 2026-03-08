@@ -150,6 +150,12 @@ def find_price():
 
 import pandas as pd
 
+os.chdir(r"C:\notebookpick")
+os.system("git fetch") 
+status = os.popen("git status -uno").read()
+if "behind" in status: 
+    os.system("git pull")
+
 data_dir = r"C:\notebookpick\data\basedata"
 files = glob.glob(os.path.join(data_dir, "basedata_*.csv"))
 latest_file = sorted(files)[-1]
@@ -241,4 +247,3 @@ os.chdir(r"C:\notebookpick")
 os.system("git add data/crawldata")
 os.system('git commit -m "크롤링 데이터 업데이트"')
 os.system("git push")
-
