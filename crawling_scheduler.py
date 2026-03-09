@@ -55,7 +55,6 @@ def check_soldout():
 
 def check_denied():
     if "Access Denied" in driver.title:
-        print("차단 페이지 감지")
         return True
 
 def find_price():
@@ -86,7 +85,6 @@ def find_price():
             except Exception:
                     continue
     
-    print("판매가:", sale_price)
     best_price = sale_price
  
     try:
@@ -147,7 +145,7 @@ def find_price():
         pass
     
     
-    return best_price
+    return best_price/10000
 
 #%%
 
@@ -186,7 +184,7 @@ def main():
 
             # 40개마다 드라이버 리셋
             if idx > 0 and idx % batch_reset == 0:
-                print("🔄 40개 처리 → 드라이버 재시작")
+                print("드라이버 재시작")
                 restart_driver()
                 time.sleep(60)
 
@@ -214,7 +212,7 @@ def main():
                 df.at[idx, "price_current"] = price
                 df.at[idx, "last_update"] = now_min
 
-                print("  저장:", price)
+                print("  저장:", price,"만")
                 time.sleep(page_wait2)
 
             except Exception as e:
@@ -235,7 +233,7 @@ def main():
         .round(1)
         )
 
-    now_str = datetime.now().strftime("%Y%m%d_%H%M")
+    now_str = datetime.now().strftime("%y%m%d_%H%M")
     save_dir = r"C:\notebookpick\data\crawldata"
     filename = f"{save_dir}\\crawldata_{now_str}.csv"
 
@@ -257,7 +255,7 @@ def main():
 
 
 
-schedule.every().day.at("03:30").do(main)
+schedule.every().day.at("02:00").do(main)
 
 while True:
 	schedule.run_pending()
