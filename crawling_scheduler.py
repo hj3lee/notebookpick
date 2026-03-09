@@ -9,6 +9,7 @@ import os
 import glob
 import pandas as pd
 import schedule
+import random
 
 
 def create_driver(version_main=144):
@@ -151,6 +152,8 @@ def find_price():
 #%%
 
 def main():
+    
+    global driver, wait
 
     os.chdir(r"C:\notebookpick")
     os.system("git fetch") 
@@ -164,7 +167,7 @@ def main():
     df = pd.read_csv(latest_file, encoding="cp949")
     
     page_wait1 = 10
-    page_wait2= 200
+    page_wait2 = random.uniform(200, 400)
     batch_reset=40
 
     driver=None
@@ -173,7 +176,7 @@ def main():
     create_driver()
 
     try:
-        for idx, row in df.iterrows():
+        for idx, row in df[df["market"] == "쿠팡"].iterrows():
             link = row["link"]
 
             if pd.isna(link):
@@ -195,6 +198,7 @@ def main():
                 if check_denied() == True:
 
                     df.at[idx, "sold_out"] = 2
+                    print('denied')
                     time.sleep(page_wait2*2)
                     restart_driver()
                     continue
@@ -202,6 +206,7 @@ def main():
 
                 if check_soldout() == True:
                     df.at[idx, "sold_out"] = 1
+                    print('sold_out')
 
                 price = find_price()
                 
@@ -252,7 +257,7 @@ def main():
 
 
 
-schedule.every().day.at("18:54").do(main)
+schedule.every().day.at("03:30").do(main)
 
 while True:
 	schedule.run_pending()
