@@ -104,4 +104,8 @@ result_df = df.sort_values("overall_score", ascending=False).head(10)
 
 from datetime import datetime
 
-result_df.to_csv(f"recommend_result_{datetime.now().strftime('%y%m%d_%H%M')}.csv", encoding="cp949", index=False)
+result_df.to_csv(
+    f"C:/Users/hj3le/Downloads/recommend_result_{datetime.now().strftime('%y%m%d_%H%M')}.csv",
+    encoding="cp949",
+    index=False
+)
