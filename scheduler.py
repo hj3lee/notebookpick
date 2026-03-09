@@ -252,7 +252,7 @@ def main():
 
 
 
-schedule.every().day.at("18:45").do(main)
+schedule.every().day.at("18:54").do(main)
 
 while True:
 	schedule.run_pending()
