@@ -252,7 +252,7 @@ def main():
     os.system("git fetch") 
     status = os.popen("git status -uno").read()
     if "behind" in status: 
-        os.system("git pull")
+        os.system("git pull --rebase")
 
 
     os.system("git add data/crawldata")
