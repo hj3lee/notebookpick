@@ -36,6 +36,7 @@ def create_driver(version_main=144):
 
 def restart_driver():
     global driver, wait
+    print("드라이버 재시작")
     try:
         driver.quit()
     except:
@@ -184,7 +185,6 @@ def main():
 
             # 40개마다 드라이버 리셋
             if idx > 0 and idx % batch_reset == 0:
-                print("드라이버 재시작")
                 restart_driver()
                 time.sleep(60)
 
@@ -245,9 +245,15 @@ def main():
     )
 
     print('csv 저장 완료')
-        
-
+    
+    
     os.chdir(r"C:\notebookpick")
+    
+    os.system("git fetch") 
+    status = os.popen("git status -uno").read()
+    if "behind" in status: 
+        os.system("git pull")
+
 
     os.system("git add data/crawldata")
     os.system('git commit -m "크롤링 데이터 업데이트"')
@@ -255,7 +261,7 @@ def main():
 
 
 
-schedule.every().day.at("02:00").do(main)
+schedule.every().day.at("02:01").do(main)
 
 while True:
 	schedule.run_pending()
