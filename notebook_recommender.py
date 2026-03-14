@@ -9,14 +9,14 @@ user_input = {
 	"acer": 4,
 
 	"budget_min": 40,      # 40~200, int
-	"budget_max": 200,     # 40~200, int
-	"budget_prefer": 130,  # 40~200, int
+	"budget_max": 120,     # 40~200, int
+	"budget_prefer": 50,  # 40~200, int
 
-	"size": 4,             # 1~5, int
-	"weight": 4,           # 1~6, int
-	"battery": 4,          # 1~6, int
-	"graphic": 4,           # 1~6, int
-	"display": 4,          # 1~6, int
+	"size": 1,             # 1~5, int
+	"weight": 1,           # 1~6, int
+	"battery": 1,          # 1~6, int
+	"graphic": 1,           # 1~6, int
+	"display": 1,          # 1~6, int
     'window':1,
 	"ips": 0,              # 0 or 1
 	"oled": 0              # 0 or 1
@@ -25,7 +25,7 @@ user_input = {
 
 
 files = glob.glob("data/crawldata/crawldata_*.csv")
-df = pd.read_csv(sorted(files)[-1], encoding="cp949")
+df = pd.read_csv(sorted(files)[-1], encoding="utf-8-sig")
 df = df[df["sold_out"].isna()]
 
 #budget_check
@@ -106,6 +106,6 @@ from datetime import datetime
 
 result_df.to_csv(
     f"C:/Users/hj3le/Downloads/recommend_result_{datetime.now().strftime('%y%m%d_%H%M')}.csv",
-    encoding="cp949",
+    encoding="utf-8-sig",
     index=False
 )
