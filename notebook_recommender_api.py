@@ -51,11 +51,11 @@ def recommend(user_input):
     #ips, oled, window score
     df["ips_score"] = 0
     if user_input["ips"] == 1:
-    	df["ips_score"] = df["ips"].apply(lambda x: 5 if x == 1 else -5)
+        df["ips_score"] = df["screen_type"].apply(lambda x: 5 if x == "ips" else -5)
     
     df["oled_score"] = 0
     if user_input["oled"] == 1:
-    	df["oled_score"] = df["oled"].apply(lambda x: 5 if x == 1 else -5)
+        df["oled_score"] = df["screen_type"].apply(lambda x: 5 if x == "oled" else -5)
     
     df["window_score"] = 0
     if user_input["window"] == 1:
@@ -76,7 +76,7 @@ def recommend(user_input):
     )
     df['overall score']=df['personal_score']+df['price_score']
     
-    result_df = df.sort_values("overall_score", ascending=False).head(15)
+    result_df = df.sort_values("overall_score", ascending=False).head(15).copy()
     
     return result_df[["link", "brand", "name", "price_current", "overall_score", "personal_score", "price_score"]]
 

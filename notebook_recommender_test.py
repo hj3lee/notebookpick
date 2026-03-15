@@ -84,7 +84,7 @@ if user_input["window"] == 1:
     
 
 
-df["perosnal_score"] = 60+(
+df["personal_score"] = 60+(
 	df["brand_score"]
 	+ df["budgetfit_score"]
 	+ df["weight_score"]
@@ -95,7 +95,7 @@ df["perosnal_score"] = 60+(
 	+ df["oled_score"]
 	+ df["window_score"]
 )
-df['overall score']=df['personal_score']+df['price_score']
+df['overall_score']=df['personal_score']+df['price_score']
 
 #%%test
 
