@@ -81,8 +81,7 @@ def recommend(user_input):
     
     
     df["personal_score"] = (
-        60
-        + df["brand_score"]
+        df["brand_score"]
         + df["budgetfit_score"]
         + df["weight_score"]
         + df["battery_score"]
@@ -91,8 +90,8 @@ def recommend(user_input):
         + df["ips_score"]
         + df["oled_score"]
         + df["window_score"]
-    )
-    df["overall_score"] = (df["personal_score"] + df["price_score"]).round(2)
+    ).round(2)
+    df["overall_score"] = (60+df["personal_score"] + df["price_score"]).round(2)
     
     
     
