@@ -78,7 +78,6 @@ def recommend(user_input):
     
     result_df = df.sort_values("overall_score", ascending=False).head(15)
     
-    return result_df[["link", "brand", "name", "price_current", "overall_score", "personal_score", "price_score"]].to_dict(orient="records")
-
+    return result_df[["link", "brand", "name", "price_current", "overall_score", "personal_score", "price_score"]]
 
 
