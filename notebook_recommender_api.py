@@ -20,15 +20,24 @@ def recommend(user_input):
     	lambda b: (user_input.get(b, brand_default.get(b, 0)) - brand_default.get(b, 0)) * 2.5
     ).clip(-10, 10)
     
-    #price_score
-    df["price_score"] = (df["discount_rate"] * -1.2).clip(-50, 24)
+        #price_score
+    df["price_score"] = (
+        df["discount_rate"] * -1.2
+    ).clip(-50, 24).round(2)
     
-    #budgetfit_score
+    # budgetfit_score
     if user_input["budget_prefer"] == 200:
-    	df["budgetfit_score"] = (5 - ((200 - df["price_current"]).clip(lower=0) / 200) * 20).clip(-5, 5)
+        df["budgetfit_score"] = (
+            5 - ((200 - df["price_current"]).clip(lower=0) / 200) * 20
+        ).clip(-5, 5).round(2)
+    
     else:
-    	df["budgetfit_score"] = (5 - (abs(df["price_current"] - user_input["budget_prefer"]) / user_input["budget_prefer"]) * 20).clip(-5, 5)
-        
+        df["budgetfit_score"] = (
+            5 - (
+                abs(df["price_current"] - user_input["budget_prefer"])
+                / user_input["budget_prefer"]
+            ) * 20
+        ).clip(-5, 5).round(2)
     #size_score
     df["size_score"] = 0
     
@@ -40,13 +49,21 @@ def recommend(user_input):
     #weight, battery, grahpic, display score
     standard_mult = [-2,-1,0,1,2,3]
     
-    df["weight_score"] = (-0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"]-1]).clip(-10,15)
+    df["weight_score"] = (
+        -0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"] - 1]
+    ).clip(-10, 15).round(2)
     
-    df["battery_score"] = (df["battery_time_centered"] * standard_mult[user_input["battery"]-1]).clip(-10,10)
+    df["battery_score"] = (
+        df["battery_time_centered"] * standard_mult[user_input["battery"] - 1]
+    ).clip(-10, 10).round(2)
     
-    df["graphic_score"] = (df["graphic_centered"] * standard_mult[user_input["graphic"]-1]).clip(-10,10)
+    df["graphic_score"] = (
+        df["graphic_centered"] * standard_mult[user_input["graphic"] - 1]
+    ).clip(-10, 10).round(2)
     
-    df["display_score"] = (df["display_centered"] * standard_mult[user_input["display"]-1]).clip(-10,10)
+    df["display_score"] = (
+        df["display_centered"] * standard_mult[user_input["display"] - 1]
+    ).clip(-10, 10).round(2)
     
     #ips, oled, window score
     df["ips_score"] = 0
@@ -63,18 +80,21 @@ def recommend(user_input):
         
     
     
-    df["personal_score"] = 60+(
-    	df["brand_score"]
-    	+ df["budgetfit_score"]
-    	+ df["weight_score"]
-    	+ df["battery_score"]
-    	+ df["graphic_score"]
-    	+ df["display_score"]
-    	+ df["ips_score"]
-    	+ df["oled_score"]
-    	+ df["window_score"]
+    df["personal_score"] = (
+        60
+        + df["brand_score"]
+        + df["budgetfit_score"]
+        + df["weight_score"]
+        + df["battery_score"]
+        + df["graphic_score"]
+        + df["display_score"]
+        + df["ips_score"]
+        + df["oled_score"]
+        + df["window_score"]
     )
-    df['overall_score']=df['personal_score']+df['price_score']
+    df["overall_score"] = (df["personal_score"] + df["price_score"]).round(2)
+    
+    
     
     result_df = df.sort_values("overall_score", ascending=False).head(15).copy()
     
