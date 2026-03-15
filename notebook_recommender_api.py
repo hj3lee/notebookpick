@@ -74,7 +74,7 @@ def recommend(user_input):
     	+ df["oled_score"]
     	+ df["window_score"]
     )
-    df['overall score']=df['personal_score']+df['price_score']
+    df['overall_score']=df['personal_score']+df['price_score']
     
     result_df = df.sort_values("overall_score", ascending=False).head(15).copy()
     
