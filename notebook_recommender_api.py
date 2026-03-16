@@ -65,6 +65,19 @@ def recommend(user_input):
         df["display_centered"] * standard_mult[user_input["display"] - 1]
     ).clip(-10, 10).round(2)
     
+    
+    score_cols = [
+    "budgetfit_score",
+    "weight_score",
+    "battery_score",
+    "graphic_score",
+    "display_score"
+]
+
+    for col in score_cols:
+        df[col] = (df[col] - df[col].mean()).round(2)
+    
+    
     #ips, oled, window score
     df["ips_score"] = 0
     if user_input["ips"] == 1:
