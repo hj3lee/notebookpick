@@ -250,6 +250,7 @@ def main():
 
 
 schedule.every().day.at("02:30").do(main)
+schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
 	schedule.run_pending()
