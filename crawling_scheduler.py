@@ -174,57 +174,45 @@ def main():
 
     create_driver()
 
-    try:
-        for idx, row in df[df["market"] == "쿠팡"].iterrows():
-            link = row["link"]
-
-            if pd.isna(link):
-                continue
-
-            print(f"[{idx}] 접속:", link)
-
-            # 40개마다 드라이버 리셋
-            if idx > 0 and idx % batch_reset == 0:
-                restart_driver()
-                time.sleep(60)
-
-            try:
-                
-                driver.get(link)
-                time.sleep(page_wait1)
-
-                if check_denied() == True:
-
-                    df.at[idx, "sold_out"] = 2
-                    print('denied')
-                    time.sleep(page_wait2*2)
-                    restart_driver()
-                    continue
-
-
-                if check_soldout() == True:
-                    df.at[idx, "sold_out"] = 1
-                    print('sold_out')
-
-                price = find_price()
-                
-                now_min = datetime.now().strftime("%Y-%m-%d %H:%M")
-                df.at[idx, "price_current"] = price
-                df.at[idx, "last_update"] = now_min
-
-                print("  저장:", price,"만")
-                time.sleep(page_wait2)
-
-            except Exception as e:
-                print("예외 발생 pass")
-                print(e)
-                pass
-                
-                
-
-    finally:
-        driver.quit()
-        
+    for idx, row in df[df["market"] == "쿠팡"].iterrows():
+    
+        link = row["link"]
+        if pd.isna(link):
+            continue
+    
+        print(f"[{idx}] 접속:", link)
+    
+        # 40개마다 드라이버 리셋
+        if idx > 0 and idx % batch_reset == 0:
+            restart_driver()
+            time.sleep(60)
+    
+        driver.get(link)
+        time.sleep(page_wait1)
+    
+        if check_denied():
+            df.at[idx, "sold_out"] = 2
+            print("denied")
+            time.sleep(page_wait2 * 2)
+            restart_driver()
+            continue
+    
+        if check_soldout():
+            df.at[idx, "sold_out"] = 1
+            print("sold_out")
+    
+        price = find_price()
+    
+        now_min = datetime.now().strftime("%Y-%m-%d %H:%M")
+        df.at[idx, "price_current"] = price
+        df.at[idx, "last_update"] = now_min
+    
+        print("  저장:", price, "만")
+        time.sleep(page_wait2)
+    
+    
+    driver.quit()
+            
     mask = df["sold_out"].isna() | (df["sold_out"] == "")
 
     df.loc[mask, "discount_rate"] = (
@@ -261,7 +249,7 @@ def main():
 
 
 
-schedule.every().day.at("02:01").do(main)
+schedule.every().day.at("02:30").do(main)
 
 while True:
 	schedule.run_pending()
