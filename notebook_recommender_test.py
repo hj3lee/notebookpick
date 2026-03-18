@@ -87,6 +87,7 @@ if user_input["window"] == 1:
 df["personal_score"] = 60+(
 	df["brand_score"]
 	+ df["budgetfit_score"]
+    + df["size_score"]
 	+ df["weight_score"]
 	+ df["battery_score"]
 	+ df["graphic_score"]
