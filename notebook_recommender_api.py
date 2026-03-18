@@ -52,7 +52,6 @@ def recommend(user_input):
     #weight, battery, grahpic, display score
     standard_mult = [-2,-1,0,1,2,3]
     
-standard_mult = [-2,-1,0,1,2,3]
 
     df["weight_score"] = (
         (-0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"] - 1])
