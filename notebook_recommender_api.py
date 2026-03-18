@@ -52,33 +52,42 @@ def recommend(user_input):
     #weight, battery, grahpic, display score
     standard_mult = [-2,-1,0,1,2,3]
     
+standard_mult = [-2,-1,0,1,2,3]
+
     df["weight_score"] = (
-        -0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"] - 1]
-    ).clip(-10, 15).round(2)
+        (-0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"] - 1])
+        .pipe(lambda x: x - x.mean())
+        .clip(-10, 15)
+        .round(2)
+    )
     
     df["battery_score"] = (
-        df["battery_time_centered"] * standard_mult[user_input["battery"] - 1]
-    ).clip(-10, 10).round(2)
+        (df["battery_time_centered"] * standard_mult[user_input["battery"] - 1])
+        .pipe(lambda x: x - x.mean())
+        .clip(-10, 10)
+        .round(2)
+    )
     
     df["graphic_score"] = (
-        df["graphic_centered"] * standard_mult[user_input["graphic"] - 1]
-    ).clip(-10, 10).round(2)
+        (df["graphic_centered"] * standard_mult[user_input["graphic"] - 1])
+        .pipe(lambda x: x - x.mean())
+        .clip(-10, 10)
+        .round(2)
+    )
     
     df["display_score"] = (
-        df["display_centered"] * standard_mult[user_input["display"] - 1]
-    ).clip(-10, 10).round(2)
+        (df["display_centered"] * standard_mult[user_input["display"] - 1])
+        .pipe(lambda x: x - x.mean())
+        .clip(-10, 10)
+        .round(2)
+    )
     
-    
-    score_cols = [
-    "budgetfit_score",
-    "weight_score",
-    "battery_score",
-    "graphic_score",
-    "display_score"
-]
-
-    for col in score_cols:
-        df[col] = (df[col] - df[col].mean()).round(2)
+    df["budgetfit_score"] = (
+        df["budgetfit_score"]
+        .pipe(lambda x: x - x.mean())
+        .clip(-10, 10)
+        .round(2)
+)
     
     
     #ips, oled, window score
@@ -99,6 +108,7 @@ def recommend(user_input):
     df["personal_score"] = (
         df["brand_score"]
         + df["budgetfit_score"]
+        + df["size_score"]
         + df["weight_score"]
         + df["battery_score"]
         + df["graphic_score"]
