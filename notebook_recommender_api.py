@@ -8,6 +8,8 @@ def recommend(user_input):
         encoding="utf-8-sig"
     )
     df_crawl = df_crawl[df_crawl["sold_out"].isna()]
+    
+    
 
     df_manual = pd.read_csv(
         sorted(glob.glob("data/manualdata/manualdata_*.csv"))[-1],
@@ -15,6 +17,12 @@ def recommend(user_input):
     )
 
     df = pd.concat([df_crawl, df_manual], ignore_index=True)
+    
+    #budget_check
+    if user_input["budget_max"] == 200:
+    	df = df[df["price_current"] >= user_input["budget_min"] * 0.9]
+    else:
+    	df = df[(df["price_current"] >= user_input["budget_min"] * 0.9) & (df["price_current"] <= user_input["budget_max"] * 1.1)]
     
     
     brand_default = {"samsung":8, "lg":8, "hp":6, "lenovo":4, "asus":4, "acer":4}
