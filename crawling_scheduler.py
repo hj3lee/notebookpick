@@ -12,7 +12,7 @@ import schedule
 import random
 
 
-def create_driver(version_main=144):
+def create_driver(version_main=146):
     options = uc.ChromeOptions()
 
     options.binary_location = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
