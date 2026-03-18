@@ -164,6 +164,7 @@ def main():
     files = glob.glob(os.path.join(data_dir, "basedata_*.csv"))
     latest_file = sorted(files)[-1]
     df = pd.read_csv(latest_file, encoding="cp949")
+    df = df[df["not_selling"] == 0]
     
     page_wait1 = 10
     page_wait2 = random.uniform(200, 400)
