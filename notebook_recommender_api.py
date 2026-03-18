@@ -116,7 +116,7 @@ def recommend(user_input):
         + df["oled_score"]
         + df["window_score"]
     ).round(2)
-    df["overall_score"] = (60+df["personal_score"] + df["price_score"]).round(2)
+    df["overall_score"] = (50+df["personal_score"] + df["price_score"]).round(2)
     
     
     
