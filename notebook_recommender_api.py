@@ -3,15 +3,18 @@ import pandas as pd, glob
 
 
 def recommend(user_input):
-    files = glob.glob("data/crawldata/crawldata_*.csv")
-    df = pd.read_csv(sorted(files)[-1], encoding="utf-8-sig")
-    df = df[df["sold_out"].isna()]
-    
-    #budget_check
-    if user_input["budget_max"] == 200:
-    	df = df[df["price_current"] >= user_input["budget_min"] * 0.9]
-    else:
-    	df = df[(df["price_current"] >= user_input["budget_min"] * 0.9) & (df["price_current"] <= user_input["budget_max"] * 1.1)]
+    df_crawl = pd.read_csv(
+        sorted(glob.glob("data/crawldata/crawldata_*.csv"))[-1],
+        encoding="utf-8-sig"
+    )
+    df_crawl = df_crawl[df_crawl["sold_out"].isna()]
+
+    df_manual = pd.read_csv(
+        sorted(glob.glob("data/manualdata/manualdata_*.csv"))[-1],
+        encoding="utf-8-sig"
+    )
+
+    df = pd.concat([df_crawl, df_manual], ignore_index=True)
     
     
     brand_default = {"samsung":8, "lg":8, "hp":6, "lenovo":4, "asus":4, "acer":4}
