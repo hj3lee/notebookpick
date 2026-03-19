@@ -10,7 +10,7 @@ user_input = {
 
 	"budget_min": 40,      # 40~200, int
 	"budget_max": 120,     # 40~200, int
-	"budget_prefer": 60,  # 40~200, int
+	"budget_prefer": 50,  # 40~200, int
 
 	"size": 4,             # 1~5, int
 	"weight": 4,           # 1~6, int
@@ -24,9 +24,20 @@ user_input = {
 
 
 
-files = glob.glob("data/crawldata/crawldata_*.csv")
-df = pd.read_csv(sorted(files)[-1], encoding="utf-8-sig")
-df = df[df["sold_out"].isna()]
+df_crawl = pd.read_csv(
+    sorted(glob.glob("data/crawldata/crawldata_*.csv"))[-1],
+    encoding="utf-8-sig"
+)
+df_crawl = df_crawl[df_crawl["sold_out"].isna()]
+
+
+
+df_manual = pd.read_csv(
+    sorted(glob.glob("data/manualdata/manualdata_*.csv"))[-1],
+    encoding="utf-8-sig"
+)
+
+df = pd.concat([df_crawl, df_manual], ignore_index=True)
 
 #budget_check
 if user_input["budget_max"] == 200:
@@ -41,15 +52,30 @@ df["brand_score"] = df["brand"].apply(
 	lambda b: (user_input.get(b, brand_default.get(b, 0)) - brand_default.get(b, 0)) * 2.5
 ).clip(-10, 10)
 
-#price_score
-df["price_score"] = (df["discount_rate"] * -1.2).clip(-50, 24)
+    #price_score
+df["price_score"] = (
+    df["discount_rate"] * -1.2
+).clip(-50, 24).round(2)
 
-#budgetfit_score
-if user_input["budget_prefer"] == 200:
-	df["budgetfit_score"] = (5 - ((200 - df["price_current"]).clip(lower=0) / 200) * 20).clip(-5, 5)
-else:
-	df["budgetfit_score"] = (5 - (abs(df["price_current"] - user_input["budget_prefer"]) / user_input["budget_prefer"]) * 20).clip(-5, 5)
-    
+# budgetfit_score
+df["budgetfit_score"] = (
+    (
+        # 조건 분기 포함한 원점수 계산
+        5 - (
+            (
+                (200 - df["price_current"]).clip(lower=0) / 200
+            )
+            if user_input["budget_prefer"] == 200
+            else (
+                abs(df["price_current"] - user_input["budget_prefer"])
+                / user_input["budget_prefer"]
+            )
+        ) * 20
+    )
+    .pipe(lambda x: x - x.mean())
+    .clip(-10, 10)
+    .round(2)
+)
 #size_score
 df["size_score"] = 0
 
@@ -61,22 +87,51 @@ if user_input["size"] != 3:
 #weight, battery, grahpic, display score
 standard_mult = [-2,-1,0,1,2,3]
 
-df["weight_score"] = (-0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"]-1]).clip(-10,15)
 
-df["battery_score"] = (df["battery_time_centered"] * standard_mult[user_input["battery"]-1]).clip(-10,10)
+df["weight_score"] = (
+    (-0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"] - 1])
+    .pipe(lambda x: x - x.mean())
+    .clip(-10, 15)
+    .round(2)
+)
 
-df["graphic_score"] = (df["graphic_centered"] * standard_mult[user_input["graphic"]-1]).clip(-10,10)
+df["battery_score"] = (
+    (df["battery_time_centered"] * standard_mult[user_input["battery"] - 1])
+    .pipe(lambda x: x - x.mean())
+    .clip(-10, 10)
+    .round(2)
+)
 
-df["display_score"] = (df["display_centered"] * standard_mult[user_input["display"]-1]).clip(-10,10)
+df["graphic_score"] = (
+    (df["graphic_centered"] * standard_mult[user_input["graphic"] - 1])
+    .pipe(lambda x: x - x.mean())
+    .clip(-10, 10)
+    .round(2)
+)
+
+df["display_score"] = (
+    (df["display_centered"] * standard_mult[user_input["display"] - 1])
+    .pipe(lambda x: x - x.mean())
+    .clip(-10, 10)
+    .round(2)
+)
+
+df["budgetfit_score"] = (
+    df["budgetfit_score"]
+    .pipe(lambda x: x - x.mean())
+    .clip(-10, 10)
+    .round(2)
+)
+
 
 #ips, oled, window score
 df["ips_score"] = 0
 if user_input["ips"] == 1:
-	df["ips_score"] = df["ips"].apply(lambda x: 5 if x == 1 else -5)
+    df["ips_score"] = df["screen_type"].apply(lambda x: 5 if x == "ips" else -5)
 
 df["oled_score"] = 0
 if user_input["oled"] == 1:
-	df["oled_score"] = df["oled"].apply(lambda x: 5 if x == 1 else -5)
+    df["oled_score"] = df["screen_type"].apply(lambda x: 5 if x == "oled" else -5)
 
 df["window_score"] = 0
 if user_input["window"] == 1:
@@ -84,25 +139,25 @@ if user_input["window"] == 1:
     
 
 
-df["personal_score"] = 60+(
-	df["brand_score"]
-	+ df["budgetfit_score"]
+df["personal_score"] = (
+    df["brand_score"]
+    + df["budgetfit_score"]
     + df["size_score"]
-	+ df["weight_score"]
-	+ df["battery_score"]
-	+ df["graphic_score"]
-	+ df["display_score"]
-	+ df["ips_score"]
-	+ df["oled_score"]
-	+ df["window_score"]
-)
-df['overall_score']=df['personal_score']+df['price_score']
+    + df["weight_score"]
+    + df["battery_score"]
+    + df["graphic_score"]
+    + df["display_score"]
+    + df["ips_score"]
+    + df["oled_score"]
+    + df["window_score"]
+).round(2)
+df["overall_score"] = (50+df["personal_score"] + df["price_score"]).round(2)
 
-#%%test
+
 
 result_df = df.sort_values("overall_score", ascending=False).head(10)
 
-
+#%%test
 from datetime import datetime
 
 result_df.to_csv(

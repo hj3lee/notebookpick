@@ -10,12 +10,12 @@ def recommend(user_input):
     df_crawl = df_crawl[df_crawl["sold_out"].isna()]
     
     
-
+    
     df_manual = pd.read_csv(
         sorted(glob.glob("data/manualdata/manualdata_*.csv"))[-1],
         encoding="utf-8-sig"
     )
-
+    
     df = pd.concat([df_crawl, df_manual], ignore_index=True)
     
     #budget_check
@@ -37,18 +37,24 @@ def recommend(user_input):
     ).clip(-50, 24).round(2)
     
     # budgetfit_score
-    if user_input["budget_prefer"] == 200:
-        df["budgetfit_score"] = (
-            5 - ((200 - df["price_current"]).clip(lower=0) / 200) * 20
-        ).clip(-5, 5).round(2)
-    
-    else:
-        df["budgetfit_score"] = (
+    df["budgetfit_score"] = (
+        (
+            # 조건 분기 포함한 원점수 계산
             5 - (
-                abs(df["price_current"] - user_input["budget_prefer"])
-                / user_input["budget_prefer"]
+                (
+                    (200 - df["price_current"]).clip(lower=0) / 200
+                )
+                if user_input["budget_prefer"] == 200
+                else (
+                    abs(df["price_current"] - user_input["budget_prefer"])
+                    / user_input["budget_prefer"]
+                )
             ) * 20
-        ).clip(-5, 5).round(2)
+        )
+        .pipe(lambda x: x - x.mean())
+        .clip(-10, 10)
+        .round(2)
+    )
     #size_score
     df["size_score"] = 0
     
@@ -60,7 +66,7 @@ def recommend(user_input):
     #weight, battery, grahpic, display score
     standard_mult = [-2,-1,0,1,2,3]
     
-
+    
     df["weight_score"] = (
         (-0.2 * df["weight_diff_pct"] * standard_mult[user_input["weight"] - 1])
         .pipe(lambda x: x - x.mean())
@@ -94,7 +100,7 @@ def recommend(user_input):
         .pipe(lambda x: x - x.mean())
         .clip(-10, 10)
         .round(2)
-)
+    )
     
     
     #ips, oled, window score
@@ -126,9 +132,7 @@ def recommend(user_input):
     ).round(2)
     df["overall_score"] = (50+df["personal_score"] + df["price_score"]).round(2)
     
-    
-    
-    result_df = df.sort_values("overall_score", ascending=False).head(15).copy()
+    result_df = df.sort_values("overall_score", ascending=False).head(15)
     
     return result_df[["link", "brand", "name", "price_current", "overall_score", "personal_score", "price_score"]]
 
