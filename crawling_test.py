@@ -4,12 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import json
-from datetime import datetime
-import os
-import glob
-import pandas as pd
-import schedule
-import random
+
 
 
 def create_driver(version_main=146):
@@ -157,7 +152,7 @@ create_driver()
 
 
 
-driver.get("https://www.coupang.com/vp/products/8688208941?itemId=25224312267&vendorItemId=92220619670")
+driver.get('https://www.coupang.com/vp/products/8563924172?itemId=24803637451&vendorItemId=91811310020')
 time.sleep(3)
 
 # 차단 체크

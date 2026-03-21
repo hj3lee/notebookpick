@@ -90,38 +90,68 @@ def find_price():
     time.sleep(5)
  
     try:
-        # --------------------------------------------------
-        benefit_btn = wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, ".conditional-benefits .ccid-detail-tit a")
-            )
-        )
-        print("[STEP 1] 버튼 찾기 성공")
-    
-        # --------------------------------------------------
-        benefit_btn.click()
-        print("[STEP 2] 버튼 클릭 성공")
+        driver.switch_to.default_content()
 
-    
         # --------------------------------------------------
-        iframe = wait.until(
+        WebDriverWait(driver, 5).until(
             EC.presence_of_element_located(
-                (By.CSS_SELECTOR, "iframe[src*='payment.coupang.com']")
+                (By.CSS_SELECTOR, ".conditional-benefits")
             )
         )
-    
+        print("[STEP 0] conditional-benefits 확인")
+
+        click_ok = False
+        iframe = None
+
+        selectors = [
+            ".conditional-benefits .ccid-detail-tit a[role='button']",
+            ".conditional-benefits .ccid-detail-tit a",
+            ".conditional-benefits .ccid-detail-tit .ccid-detail-help-icon",
+        ]
+
+        for selector in selectors:
+            try:
+                benefit_btn = WebDriverWait(driver, 3).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, selector)
+                    )
+                )
+                print(f"[STEP 1] 버튼 찾기 성공: {selector}")
+
+                driver.execute_script(
+                    "arguments[0].scrollIntoView({block:'center', inline:'center'});",
+                    benefit_btn
+                )
+                time.sleep(0.3)
+
+                driver.execute_script("arguments[0].click();", benefit_btn)
+                print(f"[STEP 2] 버튼 클릭 성공: {selector}")
+
+                iframe = WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "iframe[src*='payment.coupang.com']")
+                    )
+                )
+                print("[STEP 3] iframe 찾기 성공")
+
+                click_ok = True
+                break
+
+            except Exception as e:
+                print(f"[STEP FAIL] {selector} / {type(e).__name__} / {e}")
+
+        if not click_ok or iframe is None:
+            raise Exception("카드혜택 버튼 클릭 후 iframe 생성 실패")
+
         # --------------------------------------------------
-        print("[STEP 3] iframe 찾기 성공")
         driver.switch_to.frame(iframe)
         print("[STEP 4] iframe 전환 성공")
         time.sleep(2)
-        
 
         benefits = driver.execute_script("""
-            return window.__PRELOADED_STATE__.benefit.instantDiscountBenefitList;
+            return window.__PRELOADED_STATE__?.benefit?.instantDiscountBenefitList || [];
         """)
         print(f"[STEP 5] JS 실행 성공, 데이터 개수: {len(benefits)}")
-
         # --------------------------------------------------
         simple_cards = []
 
@@ -170,12 +200,12 @@ def main():
 
     data_dir = r"C:\notebookpick\data\basedata"
     files = glob.glob(os.path.join(data_dir, "basedata_*.csv"))
-    latest_file = sorted(files)[-1]
+    latest_file = r"C:\notebookpick\data\manualdata\_manuldata_benefit_test.csv"
     df = pd.read_csv(latest_file, encoding="cp949")
     df = df[df["not_selling"] == 0]
     
     page_wait1 = 10
-    page_wait2 = random.uniform(200, 400)
+    page_wait2 = 60
     batch_reset=40
 
     driver=None
@@ -258,7 +288,7 @@ def main():
 
 
 
-schedule.every().day.at("17:00").do(main)
+main()
 schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
