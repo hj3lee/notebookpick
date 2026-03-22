@@ -88,73 +88,65 @@ def find_price():
     
     best_price = sale_price
     time.sleep(5)
- 
+    benefits = []
+
     try:
+
         # --------------------------------------------------
-        benefit_btn = wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, ".conditional-benefits .ccid-detail-tit a")
+        WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, ".conditional-benefits")
             )
         )
-        print("[STEP 1] 버튼 찾기 성공")
-    
-        # --------------------------------------------------
-        benefit_btn.click()
-        print("[STEP 2] 버튼 클릭 성공")
 
-    
-        # --------------------------------------------------
-        iframe = wait.until(
+        # 버튼 (단일 셀렉터)
+        benefit_btn = WebDriverWait(driver, 3).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, ".conditional-benefits a[role='button']")
+            )
+        )
+
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block:'center'});",
+            benefit_btn
+        )
+        time.sleep(0.3)
+
+        driver.execute_script("arguments[0].click();", benefit_btn)
+
+        # iframe
+        iframe = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located(
                 (By.CSS_SELECTOR, "iframe[src*='payment.coupang.com']")
             )
         )
-    
+
         # --------------------------------------------------
-        print("[STEP 3] iframe 찾기 성공")
         driver.switch_to.frame(iframe)
-        print("[STEP 4] iframe 전환 성공")
         time.sleep(2)
-        
 
         benefits = driver.execute_script("""
-            return window.__PRELOADED_STATE__.benefit.instantDiscountBenefitList;
+            return window.__PRELOADED_STATE__?.benefit?.instantDiscountBenefitList || [];
         """)
-        print(f"[STEP 5] JS 실행 성공, 데이터 개수: {len(benefits)}")
 
         # --------------------------------------------------
-        simple_cards = []
-
         for item in benefits:
-            card_name = item.get("cardName")
-            discount_rate = int(item["discountAmount"]) if item.get("discountAmount") else None
-            max_discount = int(item["maxDiscountAmount"]) if item.get("maxDiscountAmount") else None
+            discount_rate = int(item["discountAmount"]) if item.get("discountAmount") else 0
+            max_discount = int(item["maxDiscountAmount"]) if item.get("maxDiscountAmount") else 1000000
 
-            simple_cards.append([card_name, discount_rate, max_discount])
-
-        
-
-        for card_name, discount_rate, max_discount in simple_cards:
-
-            # 이론 할인액
             discount_amount = int(sale_price * discount_rate / 100)
             discount_amount = min(discount_amount, max_discount)
-        
+
             final_price = sale_price - discount_amount
-        
-            # 최저가 갱신
+
             if final_price < best_price:
                 best_price = final_price
-                print('최종 가격: {best_price}')
-                
 
 
     except Exception:
-        print('카드할인 정보 미확인')
         pass
-    
-    
-    return best_price/10000
+
+    return best_price/10000, len(benefits)
 
 #%%
 
@@ -209,14 +201,14 @@ def main():
         if check_soldout():
             df.at[idx, "sold_out"] = 1
             print("sold_out")
+            continue
     
-        price = find_price()
+        df.at[idx, "price_current"], df.at[idx, "benefit_count"] = find_price()
     
         now_min = datetime.now().strftime("%Y-%m-%d %H:%M")
-        df.at[idx, "price_current"] = price
         df.at[idx, "last_update"] = now_min
     
-        print("  저장:", price, "만")
+        print(df.at[idx, "price_current"], df.at[idx, "benefit_count"])
         time.sleep(page_wait2)
     
     
@@ -258,7 +250,7 @@ def main():
 
 
 
-schedule.every().day.at("17:00").do(main)
+schedule.every().day.at("20:30").do(main)
 schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
