@@ -27,7 +27,7 @@ def recommend(user_input):
 
 
 
-    brand_default = {"SAMSUNG":8, "LG":8, "HP":6, "Lenovo":4, "ASUS":4, "acer":4}
+    brand_default = {"samsung":8, "lg":8, "hp":6, "lenovo":4, "asus":4, "acer":4}
 
     df["brand_score"] = df["brand"].apply(
         lambda b: (user_input.get(b, brand_default.get(b, 0)) - brand_default.get(b, 0)) * 2.5
