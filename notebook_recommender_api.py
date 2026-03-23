@@ -23,9 +23,10 @@ def recommend(user_input):
     	df = df[df["price_current"] >= user_input["budget_min"] * 0.9]
     else:
     	df = df[(df["price_current"] >= user_input["budget_min"] * 0.9) & (df["price_current"] <= user_input["budget_max"] * 1.1)]
+
     
     
-    brand_default = {"samsung":8, "lg":8, "hp":6, "lenovo":4, "asus":4, "acer":4}
+    brand_default = {"SAMSUNG":8, "LG":8, "HP":6, "Lenovo":4, "ASUS":4, "acer":4}
     
     df["brand_score"] = df["brand"].apply(
     	lambda b: (user_input.get(b, brand_default.get(b, 0)) - brand_default.get(b, 0)) * 2.5
@@ -60,8 +61,8 @@ def recommend(user_input):
     
     if user_input["size"] != 3:
     	df.loc[df["screen_size"] <= 14, "size_score"] = [10,5,0,-5,-10][user_input["size"]-1]
-    	df.loc[df["screen_size"] >= 15.6, "size_score"] = [-10,-5,0,5,10][user_input["size"]-1]
-    	df.loc[(df["screen_size"] > 14) & (df["screen_size"] < 15.6), "size_score"] = [-3,0,0,2,1][user_input["size"]-1]
+        df.loc[df["screen_size"] >= 15.6, "size_score"] = [-10,-5,0,5,10][user_input["size"]-1]
+        df.loc[(df["screen_size"] > 14) & (df["screen_size"] < 15.6), "size_score"] = [-3,0,0,2,1][user_input["size"]-1]
         
     #weight, battery, grahpic, display score
     standard_mult = [-2,-1,0,1,2,3]
