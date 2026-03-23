@@ -134,6 +134,6 @@ def recommend(user_input):
     df["overall_score"] = (50 + df["personal_score"] + df["price_score"]).round(2)
     
     
-    return df.sort_values("overall_score", ascending=False)
+    return df.sort_values("overall_score", ascending=False).head(15)
 
 
