@@ -250,7 +250,7 @@ def main():
 
 
 
-schedule.every().day.at("02:40").do(main)
+schedule.every().day.at("01:01").do(main)
 schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
