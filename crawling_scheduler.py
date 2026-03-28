@@ -209,7 +209,7 @@ def main():
         df.at[idx, "last_update"] = now_min
 
         if "last_update" not in df.columns:
-        df["last_update"] = ""
+            df["last_update"] = ""
 
         df["last_update"] = df["last_update"].astype("object")
     
