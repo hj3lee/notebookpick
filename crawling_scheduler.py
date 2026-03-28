@@ -207,6 +207,11 @@ def main():
     
         now_min = datetime.now().strftime("%Y-%m-%d %H:%M")
         df.at[idx, "last_update"] = now_min
+
+        if "last_update" not in df.columns:
+        df["last_update"] = ""
+
+        df["last_update"] = df["last_update"].astype("object")
     
         print(df.at[idx, "price_current"], df.at[idx, "benefit_count"])
         time.sleep(page_wait2)
@@ -250,7 +255,7 @@ def main():
 
 
 
-schedule.every().day.at("01:01").do(main)
+schedule.every().day.at("06:00").do(main)
 schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
