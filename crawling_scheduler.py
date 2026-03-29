@@ -165,6 +165,7 @@ def main():
     latest_file = sorted(files)[-1]
     df = pd.read_csv(latest_file, encoding="cp949")
     df = df[df["not_selling"] == 0]
+    df["last_update"] = df["last_update"].astype("object")
     
     page_wait1 = 10
     page_wait2 = random.uniform(200, 400)
@@ -207,11 +208,6 @@ def main():
     
         now_min = datetime.now().strftime("%Y-%m-%d %H:%M")
         df.at[idx, "last_update"] = now_min
-
-        if "last_update" not in df.columns:
-            df["last_update"] = ""
-
-        df["last_update"] = df["last_update"].astype("object")
     
         print(df.at[idx, "price_current"], df.at[idx, "benefit_count"])
         time.sleep(page_wait2)
@@ -254,8 +250,7 @@ def main():
     os.system("git push")
 
 
-
-schedule.every().day.at("06:00").do(main)
+schedule.every().day.at("00:30").do(main)
 schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
