@@ -250,7 +250,7 @@ def main():
     os.system("git push")
 
 
-schedule.every().day.at("00:30").do(main)
+schedule.every().day.at("00:42").do(main)
 schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 while True:
