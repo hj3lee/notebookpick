@@ -128,7 +128,7 @@ def recommend(user_input):
         df["display_score"],
         df["ips_score"],
         df["oled_score"],
-        df["window_score"],
+        df["window_score"], 
     ]).round(2)
 
     df["overall_score"] = (50 + df["personal_score"] + df["price_score"]).round(2)
