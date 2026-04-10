@@ -113,6 +113,8 @@ def find_price():
         time.sleep(0.3)
 
         driver.execute_script("arguments[0].click();", benefit_btn)
+        
+        time.sleep(120)
 
         # iframe
         iframe = WebDriverWait(driver, 5).until(
@@ -146,7 +148,9 @@ def find_price():
     except Exception:
         pass
 
-    return best_price/10000, len(benefits)
+    if best_price is None:
+        return sale_price / 10000, 0
+    return best_price / 10000, len(benefits)
 
 #%%
 
@@ -169,7 +173,7 @@ def main():
     
     page_wait1 = 10
     page_wait2 = random.uniform(200, 400)
-    batch_reset=40
+    batch_reset= 40
 
     driver=None
     wait=None
@@ -195,7 +199,7 @@ def main():
         if check_denied():
             df.at[idx, "sold_out"] = 2
             print("denied")
-            time.sleep(page_wait2 * 2)
+            time.sleep(page_wait2 * 5)
             restart_driver()
             continue
     
@@ -245,15 +249,14 @@ def main():
         os.system("git pull --rebase")
 
 
-    os.system("git add data/crawldata")
+    os.system("git add data/gaming/crawldata")
     os.system('git commit -m "크롤링 데이터 업데이트"')
     os.system("git push")
 
 
-#schedule.every().day.at("00:47").do(main)
-###schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
+schedule.every().day.at("01:15").do(main)
+schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
-main()
 
 while True:
 	schedule.run_pending()
