@@ -164,8 +164,8 @@ def main():
     if "behind" in status: 
         os.system("git pull")
 
-    data_dir = r"C:\notebookpick\data\gaming\masterdata"
-    files = glob.glob(os.path.join(data_dir, "gaming_masterdata_*.xlsx"))
+    data_dir = r"C:\notebookpick\data\office\masterdata"
+    files = glob.glob(os.path.join(data_dir, "office_masterdata_*.xlsx"))
     latest_file = sorted(files)[-1]
 
     df = pd.read_excel(latest_file)
@@ -234,8 +234,8 @@ def main():
     )
 
     now_str = datetime.now().strftime("%y%m%d_%H%M")
-    save_dir = r"C:\notebookpick\data\gaming\crawldata"
-    filename = f"{save_dir}\\gaming_crawldata_{now_str}.csv"
+    save_dir = r"C:\notebookpick\data\office\crawldata"
+    filename = f"{save_dir}\\office_crawldata_{now_str}.csv"
 
 
     df.to_csv(
@@ -255,7 +255,7 @@ def main():
         os.system("git pull --rebase")
 
 
-    os.system("git add data/gaming/crawldata")
+    os.system("git add data/office/crawldata")
     os.system('git commit -m "크롤링 데이터 업데이트"')
     os.system("git push")
 
