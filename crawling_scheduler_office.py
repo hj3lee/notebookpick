@@ -169,7 +169,11 @@ def main():
     latest_file = sorted(files)[-1]
 
     df = pd.read_excel(latest_file)
+    
+    if "last_update" not in df.columns:
+        df["last_update"] = ""
 
+    df["last_update"] = df["last_update"].astype("object")
     
     page_wait1 = 10
     page_wait2 = random.uniform(200, 400)
