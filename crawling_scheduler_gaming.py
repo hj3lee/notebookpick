@@ -110,11 +110,11 @@ def find_price():
             "arguments[0].scrollIntoView({block:'center'});",
             benefit_btn
         )
-        time.sleep(0.3)
+        time.sleep(120)
 
         driver.execute_script("arguments[0].click();", benefit_btn)
         
-        time.sleep(120)
+
 
         # iframe
         iframe = WebDriverWait(driver, 5).until(
@@ -164,8 +164,8 @@ def main():
     if "behind" in status: 
         os.system("git pull")
 
-    data_dir = r"C:\notebookpick\data\office\masterdata"
-    files = glob.glob(os.path.join(data_dir, "office_masterdata_*.xlsx"))
+    data_dir = r"C:\notebookpick\data\gaming\masterdata"
+    files = glob.glob(os.path.join(data_dir, "gaming_masterdata_*.xlsx"))
     latest_file = sorted(files)[-1]
 
     df = pd.read_excel(latest_file)
@@ -177,7 +177,7 @@ def main():
     
     page_wait1 = 10
     page_wait2 = random.uniform(200, 400)
-    batch_reset= 80
+    batch_reset= 100
 
     driver=None
     wait=None
@@ -194,7 +194,7 @@ def main():
     
         print(f"[{idx}] 접속:", link)
     
-        # 40개마다 드라이버 리셋
+  
         if idx > 0 and idx % batch_reset == 0:
             restart_driver()
             time.sleep(60)
@@ -238,8 +238,8 @@ def main():
     )
 
     now_str = datetime.now().strftime("%y%m%d_%H%M")
-    save_dir = r"C:\notebookpick\data\office\crawldata"
-    filename = f"{save_dir}\\office_crawldata_{now_str}.csv"
+    save_dir = r"C:\notebookpick\data\gaming\crawldata"
+    filename = f"{save_dir}\\gaming_crawldata_{now_str}.csv"
 
 
     df.to_csv(
@@ -259,17 +259,15 @@ def main():
         os.system("git pull --rebase")
 
 
-    os.system("git add data/office/crawldata")
+    os.system("git add data/gaming/crawldata")
     os.system('git commit -m "크롤링 데이터 업데이트"')
     os.system("git push")
 
 
-#schedule.every().day.at("00:15").do(main)
-#schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
+#schedule.every().day.at("00:05").do(main)
+schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 
 main()
-
-
 while True:
 	schedule.run_pending()
 	time.sleep(1)

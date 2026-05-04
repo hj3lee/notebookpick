@@ -264,9 +264,8 @@ def main():
     os.system("git push")
 
 
-#schedule.every().day.at("00:15").do(main)
-#schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
-
+#schedule.every().day.at("00:05").do(main)
+schedule.every().hour.do(lambda: print(datetime.now().strftime("%m-%d %H:%M"), "정상작동중"))
 main()
 
 
