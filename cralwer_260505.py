@@ -30,7 +30,7 @@ WP_URL  = os.getenv("NBP_WP_URL", "https://hj3lee.mycafe24.com")  # 워드프레
 API_KEY = os.getenv("NBP_API_KEY", "NBP_SECRET_BOT_9999")  # REST API 인증 키
 SCHEDULE_TIME = os.getenv("NBP_SCHEDULE", "01:30")
 PAGE_WAIT_MIN = 250   # 최소 대기
-PAGE_WAIT_MAX = 300   # 최대 대기
+PAGE_WAIT_MAX = 350   # 최대 대기
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("auto_bot")
@@ -243,7 +243,7 @@ def run_crawl(mode="all", split=None):
 
 def main():
     parser = argparse.ArgumentParser(description="노트북픽 쿠팡 자동 가격 수집 봇")
-    parser.add_argument("--mode", choices=["office", "gaming", "all"], default="all", help="크롤링 유형")
+    parser.add_argument("--mode", choices=["office", "gaming", "all"], default="office", help="크롤링 유형")
     parser.add_argument("--split", choices=["even", "odd"], default=None, help="ID 짝/홀수 분할")
     parser.add_argument("--schedule", action="store_true", help="매일 지정 시각 자동 반복")
     args = parser.parse_args()
