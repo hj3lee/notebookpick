@@ -152,7 +152,9 @@ def find_price():
         return None, 0
     return best_price / 10000, len(benefits)
 
-#%%
+
+driver=None
+wait=None
 
 def main():
     
@@ -225,6 +227,7 @@ def main():
     
     
     driver.quit()
+    driver=None
     
     mask = (
         (df["is_active"] == 1) &
